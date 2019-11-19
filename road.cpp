@@ -4,12 +4,12 @@
 #include <unordered_map>
 
 using namespace std;
-long long int solve(long long int Cs,long long int Cf,long long int Ts,long long int Tf,long long int c,long long int d){
+long long unsigned int solve(long long unsigned int Cs,long long unsigned int Cf,long long unsigned int Ts,long long unsigned int Tf,long long unsigned int c,long long unsigned int d){
   if(c-d*Cs<0){
-    //cout << "Exit distance is " << d << endl;
+    cout << "Exit distance is " << d << endl;
     return -1;
   }
-  long long int temp = (c-d*Cs)/(Cf-Cs);
+  long long unsigned int temp = (c-d*Cs)/(Cf-Cs);
   while( (d-temp)< 0){
       //cout << temp << endl;
       temp --;
@@ -23,17 +23,20 @@ long long int solve(long long int Cs,long long int Cf,long long int Ts,long long
 }
 
 int main(int argc, char** argv){
-  long long int N,K,D,T,time,fast,slow,Ts,Cs,Tf,Cf,currentN,j;
-  unordered_map<long long int, long long int> Costs;
+  long long unsigned int N,K,D,T,time,fast,slow,Ts,Cs,Tf,Cf,currentN;
+  int j;
+  unordered_map<long long unsigned int, long long unsigned int> Costs;
   ifstream infile;
   infile.open(argv[1]);
   infile >>  N >> K >> D >> T ;
-  long long int * dist = new long long int[K+1];
-  long long int cost;
-  long long int *cap = new long long int[N];
-  for(long long int i=0; i<N; i++){
+  //cin >>  N >> K >> D >> T ;
+  long long unsigned int * dist = new long long unsigned int[K+1];
+  long long unsigned int cost;
+  long long unsigned int *cap = new long long unsigned int[N];
+  for(int i=0; i<N; i++){
     infile >> cost >> cap[i];
-    if(cost == 1){
+    //cin >> cost >> cap[i];
+    if(cost == 229258151){
         cout << endl << endl << cap[i] << endl << endl;
     }
     if (Costs.find(cap[i]) == Costs.end()){
@@ -44,13 +47,14 @@ int main(int argc, char** argv){
     }
   }
   sort(cap,cap + N);
-  for(long long int i=0; i<K; i++){
+  for(long long unsigned int i=0; i<K; i++){
     infile >> dist[i];
+  //cin >> dist[i];
   }
-  dist[K+1] = D;
+  dist[K] = D;
   sort(dist,dist+K+1);
-  long long int maxDistance=dist[0];
-  for(long long int l=1; l<K+1; l++){
+  long long unsigned int maxDistance=dist[0];
+  for(long long unsigned int l=1; l<K+1; l++){
     maxDistance = max(maxDistance,dist[l]-dist[l-1]);
   }
   if(cap[N-1]<maxDistance){
@@ -58,12 +62,13 @@ int main(int argc, char** argv){
     return 0;
   }
   infile >> Ts >> Cs >> Tf >> Cf;
+  //cin >> Ts >> Cs >> Tf >> Cf;
   infile.close();
   bool Acceptable = false;
   bool Faulty = false;
-  long long int temp;
-  long long int distance;
-  long long int step = N/2;
+  long long unsigned int temp;
+  long long unsigned int distance;
+  long long unsigned int step = N/2;
   currentN = N/2;
   while(step!=0){
     step = step / 2;
@@ -71,32 +76,34 @@ int main(int argc, char** argv){
     distance = 0;
         for(j=0; j<K; j++){
           if(cap[currentN]<maxDistance){
+            cout << "hERE" << endl;
             temp=-1;
             break;
           }
           distance = dist[j+1] - dist[j];
-          long long int what = j;
+          long long unsigned int what = j;
           if(distance < cap[currentN]/Cf){
               while(distance < cap[currentN]/Cf && j<K){
-                distance = dist[j++] - dist[what];
+                distance = dist[++j] - dist[what];
               }
               if (j<K){
-                  distance = dist[--j] - dist[what];
+                  j--;
+                  distance = dist[j] - dist[what];
               }
           }
-          cout << endl << "Distance is " << distance << " ,capacity is " << cap[currentN] << endl;
-          cout << "CurrentN = " << currentN << endl;
+          //cout << endl << "Distance is " << distance << " ,capacity is " << cap[currentN] << endl;
+          //cout << "CurrentN = " << currentN << endl;
           temp = solve(Cs,Cf,Ts,Tf,cap[currentN],distance);
           if(temp==-1 || time > T){
-              Faulty = true;
               //cout << "Time is " << time << " when it should have been " << T <<endl;
               break;
             }
             time = time + temp;
-        //    cout << "Time = " <<  time  << " ,CurrentN = " << currentN << " ,Capacity = "<< cap[currentN] << " ,Current station is " << dist[j] << endl;
+            cout << "Time = " <<  time  << " ,CurrentN = " << currentN << " ,Capacity = "<< cap[currentN] << " ,Current station is " << dist[j] << endl;
         }
         //cout << "STOP" << endl;
         if(temp == -1 || time > T){
+          Faulty = true;
             if(step!=0){
                 currentN = currentN+step;
             }
@@ -113,11 +120,12 @@ int main(int argc, char** argv){
     }
     if (currentN >= N){
         cout << -1 <<endl;
+        delete dist;
+        delete cap;
         return 0;
     }
     if(!Faulty && Acceptable){
-        //cout << "HERE" << endl;
-        for(long long int i = currentN; i>=0; i--){
+        for(int i = currentN; i>=0; i--){
             time = 0;
             distance = 0;
                 for(j=0; j<K; j++){
@@ -126,18 +134,18 @@ int main(int argc, char** argv){
                     break;
                   }
                   distance = dist[j+1] - dist[j];
-                  long long int what = j;
+                  long long unsigned int what = j;
                   if(distance < cap[i]/Cf){
                       //cout << "FUCK" << endl;
                       while(distance < cap[i]/Cf && j<K){
-                        distance = dist[j++] - dist[what];
+                        distance = dist[++j] - dist[what];
                       }
                       if (j<K){
                           distance = dist[--j] - dist[what];
                       }
                   }
                   //cout << endl << "Distance is " << distance << " ,capacity is " << i << endl;
-                //          cout << "CurrentN = " << i << endl;
+                  //        cout << "CurrentN = " << i << endl;
                   temp = solve(Cs,Cf,Ts,Tf,cap[i],distance);
                   if(temp==-1 || time > T){
                       break;
@@ -146,14 +154,14 @@ int main(int argc, char** argv){
                     //cout << "Time = " <<  time  << " ,CurrentN = " << i << " ,Capacity = "<< cap[currentN] << " ,Current station is " << dist[j] << endl;
                 }
                 if(temp == -1 || time > T){
-                    currentN = i;
+                    currentN = i+1;
                     break;
                 }
                 currentN = i;
         }
     }
     if(!Acceptable && Faulty){
-        for(long long int i = currentN; i<N; i++){
+        for(int i = currentN; i<N; i++){
             time = 0;
             distance = 0;
                 for(j=0; j<K; j++){
@@ -162,13 +170,14 @@ int main(int argc, char** argv){
                     break;
                   }
                   distance = dist[j+1] - dist[j];
-                  long long int what = j;
+                  long long unsigned int what = j;
                   if(distance < cap[i]/Cf){
                       while(distance < cap[i]/Cf && j<K){
-                        distance = dist[j++] - dist[what];
+                        distance = dist[++j] - dist[what];
                       }
                       if (j<K){
-                          distance = dist[--j] - dist[what];
+                        j--;
+                          distance = dist[j] - dist[what];
                       }
                   }
                   //cout << endl << "Distance is " << distance << " ,capacity is " << cap[i] << endl;
@@ -178,7 +187,7 @@ int main(int argc, char** argv){
                       break;
                     }
                     time = time + temp;
-                    //cout << "Time = " <<  time  << " ,CurrentN = " << i << " ,Capacity = "<< cap[currentN] << " ,Current station is " << dist[j] << endl;
+                    cout << "Time = " <<  time  << " ,CurrentN = " << i << " ,Capacity = "<< cap[currentN] << " ,Current station is " << dist[j] << endl;
                 }
                 if(temp != -1 && time <= T){
                     currentN = i;
@@ -186,20 +195,27 @@ int main(int argc, char** argv){
                 }
                 if(i==N-1){
                     cout << -1 << endl;
+                    delete dist;
+                    delete cap;
                     return 0;
                 }
         }
     }
+          cout << "FAT" << endl;
     if (currentN >= N){
         cout << -1 <<endl;
+        delete dist;
+        delete cap;
         return 0;
     }
     else{
-      long long int temp1 = Costs[cap[currentN]];
-        for(long long int i=currentN; i<N; i++){
+      long long unsigned int temp1 = Costs[cap[currentN]];
+        for(int i=currentN; i<N; i++){
           temp1 = min(Costs[cap[i]],temp1);
     }
     cout << temp1 << endl;
+    delete dist;
+    delete cap;
     return 0;
   }
   return 0;
